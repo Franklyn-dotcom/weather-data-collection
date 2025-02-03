@@ -24,7 +24,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m unittest discover -s tests
+        python -m unittest discover -s tests src/tests
 
     # - name: Deploy to AWS
     #   uses: appleboy/ssh-action@master
