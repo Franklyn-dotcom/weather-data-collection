@@ -24,7 +24,7 @@ jobs:
 
     - name: Run tests
       run: |
-        cd /weather-data-collection/src/
+        cd weather-data-collection/src/
         python -m unittest discover -s tests
 
     # - name: Deploy to AWS
