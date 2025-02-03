@@ -17,7 +17,7 @@ A python Application that fetches real-time weather data from OpenWeather API, c
 ## How to Run:
 ### 1. Clone the repository:
 ```bash
-git clone https://github.com/Franklyn-dotcom/DevOps-AllStar-Challenge.git
+git clone https://github.com/Franklyn-dotcom/weather-data-collection.git
 ```
 
 ### 2. Configure AWS Credential in the CLI:
@@ -63,10 +63,11 @@ python src/weather_dashboard.py
 ![running-script](/Images/running-file-success-2.png)
 ![running-script](/Images/running-file-success-3.png)
 ![dashboard-script](/Images/dashboard-s3.png)
-![running-script](/Images/dashboard-s3-object.png)
-![running-script](/Images/dashboard-s3-object-upload.png)
+![dashboard-script](/Images/dashboard-s3-object.png)
+![dashboard-script](/Images/dashboard-s3-object-upload.png)
 
 
 ## Further Enhancements
 As an additional (non-challenge) feature, I created a user input to add another city and a streamline pipeline with a push event that runs a test on the application and run the application itself.
 
+![automate-script](/Images/automate-success.png)
