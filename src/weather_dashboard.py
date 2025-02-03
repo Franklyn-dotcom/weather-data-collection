@@ -35,25 +35,6 @@ class WeatherDashboard:
             response.raise_for_status()
             return response.json()
 
-    # create a function that fetch weather forecast data from weatherapi 
-    def fetch_weather_forecast(self, city):
-        """Fetch weather forecast data from WeatherAPI"""
-        base_url = "http://api.weatherapi.com/v1/forecast.json"
-        params = {
-            "key": self.apiKey,
-            "q": city,
-            "days": 3
-        }
-
-        # Fetch weather forecast data from API and handle errors if any occur
-        try:
-            response = requests.get(base_url, params=params)
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching weather forecast data: {e}")
-            return None
-        else:
-            response.raise_for_status()
-            return response.json()
         
     def create_bucket_if_not_exists(self):
         """Create S3 bucket if it doesn't exist"""

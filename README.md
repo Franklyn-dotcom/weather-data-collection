@@ -5,7 +5,7 @@ A python Application that fetches real-time weather data from OpenWeather API, c
 - Fetches current weather data including temperature, humidity, and weather description for selected cities.
 - Collects user input to add another city to the list of cities.
 - Creates an S3 bucket containing weather data for selected cities and stores them in a json format.
-- A streamline pipeline used for automating the application. 
+- A streamline pipeline used for automating the application and testing the application. 
 
 ## Prerequisites
 - AWS Account
@@ -32,13 +32,13 @@ Run the following command to create a virtual environment:
 ```bash
   python -m venv <name-of-your-virtual-env-folder>
 ```
-![venv-script](/Images/python-run-file.png)
+
 
 To activate the virtual environment in powershell. Run the following command:
 ```bash
-    .\venv\Script\Activate.ps1
+.\venv\Script\Activate.ps1
 ```
-![venv-activate](/Images/python-venv-activate.png)
+![venv-activate](/Images/venv-activate.png)
 
 
 ### 4. Install the dependencies
@@ -46,7 +46,7 @@ Run the following command to install the dependencies using the `requirement.txt
 ```bash
 pip install -r requirements.txt
 ```
-![pip-install](/Images/installing-dependencies.png)
+![pip-install](/Images/pip-install-requirements.png)
 
 ### 5. Configure environment variables (.env):
 Create a .env file in the root directory with the following content:
@@ -59,9 +59,7 @@ To run the application, run the following command:
 ```bash
 python src/weather_dashboard.py
 ```
-![running-script](/Images/running-file-success.png)
-![running-script](/Images/running-file-success-2.png)
-![running-script](/Images/running-file-success-3.png)
+![run-application](/Images/running-code-successfully.png)
 ![dashboard-script](/Images/dashboard-s3.png)
 ![dashboard-script](/Images/dashboard-s3-object.png)
 ![dashboard-script](/Images/dashboard-s3-object-upload.png)
