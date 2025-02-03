@@ -32,6 +32,5 @@ jobs:
     #     username: ${{ secrets.USERNAME }} 
     #     password: ${{ secrets.PASSWORD }}
     #     script: |
-    #       cd /DevOps-AllStar-Challenge/Day1/src
     #       git pull
     #       python src/weather_dashboard.py

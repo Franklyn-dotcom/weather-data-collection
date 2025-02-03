@@ -69,3 +69,7 @@ python src/weather_dashboard.py
 As an additional (non-challenge) feature, I created a user input to add another city and a streamline pipeline with a push event that runs a test on the application and run the application itself.
 
 ![automate-script](/Images/automate-success.png)
+
+## Resources
+- [Unittest Python](https://youtu.be/6tNS--WetLI?si=RgDeMntzNDryw_gn): Learn more about testing in python
+- [OpenWeather API](https://openweathermap.org/api): Learn more about OpenWeather API
