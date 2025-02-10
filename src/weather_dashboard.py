@@ -142,16 +142,16 @@ def main():
             temp = weather_data['list'][0]['main']['temp']
             feels_like = weather_data['list'][0]['main']['feels_like']
             humidity = weather_data['list'][0]['main']['humidity']
-            description = weather_data['list'][0]['weather'][0]['description']
+            conditions = weather_data['list'][0]['weather'][0]['description']
             
             print(f"Temperature: {temp}°F")
             print(f"Feels like: {feels_like}°F")
             print(f"Humidity: {humidity}%")
-            print(f"Conditions: {description}")
+            print(f"Conditions: {conditions}")
 
             # Add temperatures and conditions to respective lists
             temperatures.append(temp)
-            condtions.append(description)
+            condtions.append(conditions)
         
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
@@ -161,7 +161,7 @@ def main():
             print(f"Failed to fetch weather data for {city}")
 
     # visualize weather data
-    visualize_weather_data(cities, temperatures, condtions)
+    visualize_weather_data(cities, temperatures, conditions)
 
     return "Weather data collected successfully"
     
