@@ -86,6 +86,24 @@ class WeatherDashboard:
             print(f"Error saving to S3: {e}")
             return False
 
+# Visualize the weather data using a graphing library (e.g., matplotlib)
+def visualize_weather_data(cities, temperatures, conditions):
+    # Visualize the weather data using matplotlib.
+    axes = plt.subplots()[1]
+    # Create a bar chart
+    axes.bar(cities, temperatures, color= 'skyblue')
+        # Add labels and title
+    axes.set_xlabel('City')
+    axes.set_ylabel('Temperature (°F)')
+    axes.set_title(f"Weather in {cities} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Annotate each bar chart with the weather conditions
+    for i, condition in enumerate(conditions):
+        axes.text(i, temperatures[i], condition, ha='center', va='bottom')
+
+    # Display the plot
+    plt.show()
+
 def main():
     dashboard = WeatherDashboard()
     
@@ -134,8 +152,6 @@ def main():
             # Add temperatures and conditions to respective lists
             temperatures.append(temp)
             condtions.append(description)
-        # visualize weather data
-        visualize_weather_data(city, temperatures, condtions)
         
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
@@ -143,25 +159,10 @@ def main():
             print(f"Weather data for {city} saved to S3!")
         else:
             print(f"Failed to fetch weather data for {city}")
-    
-    # Visualize the weather data using a graphing library (e.g., matplotlib)
-    def visualize_weather_data(city, temperatures, conditions):
-        # Visualize the weather data using matplotlib.
-        axes = plt.subplots()[1]
-        # Create a bar chart
-        axes.bar(city, temperatures, color= 'skyblue')
-        # Add labels and title
-        axes.set_xlabel('City')
-        axes.set_ylabel('Temperature (°F)')
-        axes.set_title(f"Weather in {city} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-        # Annotate each bar chart with the weather conditions
-        for i, condition in enumerate(conditions):
-            axes.text(i, temperatures[i], condition, ha='center', va='bottom')
+    # visualize weather data
+    visualize_weather_data(cities, temperatures, condtions)
 
-        # Display the plot
-        plt.show()
-    
     return "Weather data collected successfully"
     
 
