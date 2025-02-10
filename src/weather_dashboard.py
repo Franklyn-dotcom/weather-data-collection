@@ -99,7 +99,8 @@ def visualize_weather_data(cities, temperatures, conditions):
 
     # Annotate each bar chart with the weather conditions
     for i, condition in enumerate(conditions):
-        axes.text(i, temperatures[i], condition, ha='center', va='bottom')
+        if i < len(temperatures):
+            axes.text(i, temperatures[i], condition, ha='center', va='bottom')
 
     # Display the plot
     plt.show()
