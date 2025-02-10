@@ -41,14 +41,14 @@ To activate the virtual environment in powershell. Run the following command:
 ![venv-activate](/Images/venv-activate.png)
 
 
-### 4. Install the dependencies
-Run the following command to install the dependencies using the `requirement.txt file`:
+### 4. Install the packages
+After activating the virtual environment. Run the following command to install the packages using the `requirement.txt` file:
 ```bash
 pip install -r requirements.txt
 ```
 ![pip-install](/Images/pip-install-requirements.png)
 
-### 5. Configure environment variables (.env):
+### 5. Configure the environment variables (.env):
 Create a .env file in the root directory with the following content:
 ```bash
 OPENWEATHER_API_KEY=your_api_key

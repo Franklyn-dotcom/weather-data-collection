@@ -4,6 +4,7 @@ import boto3
 import requests
 from datetime import datetime
 from dotenv import load_dotenv
+import matplotlib.pyplot as plt
 
 # Load environment variables
 load_dotenv()
@@ -18,7 +19,7 @@ class WeatherDashboard:
 
     def fetch_weather(self, city):
         """Fetch weather data from OpenWeather API"""
-        base_url = "http://api.openweathermap.org/data/2.5/weather"
+        base_url = "http://api.openweathermap.org/data/2.5/forecast?"
         params = {
             "q": city,
             "appid": self.api_key,
@@ -123,6 +124,8 @@ def main():
             print(f"Humidity: {humidity}%")
             print(f"Conditions: {description}")
 
+        # visualize weather data
+        visualize_weather_data(city, temp)
         
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
@@ -130,6 +133,24 @@ def main():
             print(f"Weather data for {city} saved to S3!")
         else:
             print(f"Failed to fetch weather data for {city}")
+    
+    # Visualize the weather data using a graphing library (e.g., matplotlib)
+    def visualize_weather_data(city, temp, description):
+        # Visualize the weather data using matplotlib.
+        axes = plt.subplots()[1]
+        # Create a bar chart
+        axes.bar(city, temp, color= 'skyblue')
+        # Add labels and title
+        axes.set_xlabel('City')
+        axes.set_ylabel('Temperature (°F)')
+        axes.set_title(f"Weather in {city} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+        # Annotate each bar chart with the weather conditions
+        for i, condition in enumerate(description):
+            axes.text(i, temp[i], condition, ha='center', va='bottom')
+
+        # Display the plot
+        plt.show()
     
     return "Weather data collected successfully"
     
