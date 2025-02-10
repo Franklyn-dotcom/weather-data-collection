@@ -41,11 +41,16 @@ Run the following command to create a virtual environment:
 ```
 After creating your virtual environment, you need to activate your virtual environment before installing or using any packages in your virtual environment.
 
-To activate the virtual environment in powershell. Run the following command:
+To activate the virtual environment on Windows(powershell). Run the following command:
 ```bash
 .\venv\Script\Activate.ps1
 ```
 ![venv-activate](/Images/venv-activate.png)
+
+On MacOs/Linux:
+```bash
+source venv/bin/activate
+```
 
 ## Step 4: Installing the packages and libraries
 After activating the virtual environment. Run the following command to install the packages using the `requirement.txt` file:
