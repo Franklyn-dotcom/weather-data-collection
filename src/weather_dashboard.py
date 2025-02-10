@@ -107,6 +107,13 @@ def main():
         else:
                 print("Invalid input. Please enter 'yes' or 'no'.")
 
+    #create an empty list for conditions
+    condtions = []
+    # create an empty list for temperatures
+    temperatures = []
+
+
+
     for city in cities:
 
         print(f"\nFetching weather for {city}...")
@@ -114,18 +121,21 @@ def main():
         # create a variable to hold the weather data for the city and print the temperature, feels like, humidity and description
         weather_data = dashboard.fetch_weather(city)
         if weather_data:
-            temp = weather_data['main']['temp'] 
-            feels_like = weather_data['main']['feels_like']
-            humidity = weather_data['main']['humidity']
-            description = weather_data['weather'][0]['description']
+            temp = weather_data['list'][0]['main']['temp']
+            feels_like = weather_data['list'][0]['main']['feels_like']
+            humidity = weather_data['list'][0]['main']['humidity']
+            description = weather_data['list'][0]['weather'][0]['description']
             
             print(f"Temperature: {temp}°F")
             print(f"Feels like: {feels_like}°F")
             print(f"Humidity: {humidity}%")
             print(f"Conditions: {description}")
 
+            # Add temperatures and conditions to respective lists
+            temperatures.append(temp)
+            condtions.append(description)
         # visualize weather data
-        visualize_weather_data(city, temp)
+        visualize_weather_data(city, temperatures, condtions)
         
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
@@ -135,19 +145,19 @@ def main():
             print(f"Failed to fetch weather data for {city}")
     
     # Visualize the weather data using a graphing library (e.g., matplotlib)
-    def visualize_weather_data(city, temp, description):
+    def visualize_weather_data(city, temperatures, conditions):
         # Visualize the weather data using matplotlib.
         axes = plt.subplots()[1]
         # Create a bar chart
-        axes.bar(city, temp, color= 'skyblue')
+        axes.bar(city, temperatures, color= 'skyblue')
         # Add labels and title
         axes.set_xlabel('City')
         axes.set_ylabel('Temperature (°F)')
         axes.set_title(f"Weather in {city} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
         # Annotate each bar chart with the weather conditions
-        for i, condition in enumerate(description):
-            axes.text(i, temp[i], condition, ha='center', va='bottom')
+        for i, condition in enumerate(conditions):
+            axes.text(i, temperatures[i], condition, ha='center', va='bottom')
 
         # Display the plot
         plt.show()
