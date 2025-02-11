@@ -7,7 +7,7 @@
 3. Create a virtual environment(venv)
 4. Installing the packages and libraries
 5. Configuring the environment variables
-6. Create a Python File
+6. Creating a Python File
 7. Conclusion
 
 Have you ever wondered how weather data is collected or analyzed?
@@ -66,14 +66,15 @@ OPENWEATHER_API_KEY=your_api_key
 AWS_BUCKET_NAME=your_bucket_name
 ```
 ## Step 6: Creating a Python file
-After configuring the environment variables. Create a python file named `weather-data.py` and copy and paste the following code into the file:
+After configuring the environment variables. Create a python file named `weather-dashbosrd.py`, copy and paste the following code into the file:
 ```python
-import os
+    import os
 import json
 import boto3
 import requests
 from datetime import datetime
 from dotenv import load_dotenv
+import matplotlib.pyplot as plt
 
 # Load environment variables
 load_dotenv()
@@ -88,7 +89,7 @@ class WeatherDashboard:
 
     def fetch_weather(self, city):
         """Fetch weather data from OpenWeather API"""
-        base_url = "http://api.openweathermap.org/data/2.5/weather"
+        base_url = "http://api.openweathermap.org/data/2.5/forecast?"
         params = {
             "q": city,
             "appid": self.api_key,
@@ -155,6 +156,25 @@ class WeatherDashboard:
             print(f"Error saving to S3: {e}")
             return False
 
+# Visualize the weather data using a graphing library (e.g., matplotlib)
+def visualize_weather_data(cities, temperatures, conditions):
+    # Visualize the weather data using matplotlib.
+    axes = plt.subplots()[1]
+    # Create a bar chart
+    axes.bar(cities, temperatures, color= 'skyblue')
+        # Add labels and title
+    axes.set_xlabel('City')
+    axes.set_ylabel('Temperature (°F)')
+    axes.set_title(f"Weather in {cities} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Annotate each bar chart with the weather conditions
+    for i, condition in enumerate(conditions):
+        if i < len(temperatures):
+            axes.text(i, temperatures[i], condition, ha='center', va='bottom')
+
+    # Display the plot
+    plt.show()
+
 def main():
     dashboard = WeatherDashboard()
     
@@ -176,7 +196,13 @@ def main():
         else:
                 print("Invalid input. Please enter 'yes' or 'no'.")
 
-    
+    #create an empty list for conditions
+    conditions = []
+    # create an empty list for temperatures
+    temperatures = []
+
+
+
     for city in cities:
 
         print(f"\nFetching weather for {city}...")
@@ -184,24 +210,31 @@ def main():
         # create a variable to hold the weather data for the city and print the temperature, feels like, humidity and description
         weather_data = dashboard.fetch_weather(city)
         if weather_data:
-            temp = weather_data['list'][0]['main']['temp'] 
+            temp = weather_data['list'][0]['main']['temp']
             feels_like = weather_data['list'][0]['main']['feels_like']
             humidity = weather_data['list'][0]['main']['humidity']
-            description = weather_data['list'][0]['weather'][0]['description']
+            condition = weather_data['list'][0]['weather'][0]['description']
             
             print(f"Temperature: {temp}°F")
             print(f"Feels like: {feels_like}°F")
             print(f"Humidity: {humidity}%")
-            print(f"Conditions: {description}")
+            print(f"Conditions: {conditions}")
 
-        
+            # Add temperatures and conditions to respective lists
+            temperatures.append(temp)
+            conditions.append(condition)
+
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
         if success:
             print(f"Weather data for {city} saved to S3!")
         else:
             print(f"Failed to fetch weather data for {city}")
-    
+
+    # visualize weather data
+    # print(city)
+    visualize_weather_data(cities, temperatures, conditions)
+
     return "Weather data collected successfully"
     
 
@@ -210,93 +243,100 @@ if __name__ == "__main__":
     main()
 ```
 Lets's breakdown what the code is doing here: 
-```python
+
+**Class Definition**
+```Python
 class WeatherDashboard:
     def __init__(self):
         self.api_key = os.getenv('OPENWEATHER_API_KEY')
-        self.apiKey = os.getenv('WEATHER_FORECAST_API_KEY')
         self.bucket_name = os.getenv('AWS_BUCKET_NAME')
         self.s3_client = boto3.client('s3')
-
-
-    def fetch_weather(self, city):
-        """Fetch weather data from OpenWeather API"""
-        base_url = "http://api.openweathermap.org/data/2.5/weather"
-        params = {
-            "q": city,
-            "appid": self.api_key,
-            "units": "imperial"
-        }
-        
-        # Fetch weather data from API and handle errors if any occur
-        try:
-            response = requests.get(base_url, params=params)
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching weather data: {e}")
-            return None
-        else:
-            response.raise_for_status()
-            return response.json()
-
-        
-    def create_bucket_if_not_exists(self):
-        """Create S3 bucket if it doesn't exist"""
-        try:
-            self.s3_client.head_bucket(Bucket=self.bucket_name)
-            print(f"Bucket {self.bucket_name} exists")
-        except:
-            print(f"Creating bucket {self.bucket_name}")
-        try:
-            # check if default region is us-east-1 and create bucket 
-            if os.getenv('AWS_DEFAULT_REGION') == 'us-east-1':
-                self.s3_client.create_bucket(Bucket=self.bucket_name)
-                print(f"Successfully created bucket {self.bucket_name}")
-            else:
-                self.s3_client.create_bucket(
-                    Bucket=self.bucket_name,
-                    CreateBucketConfiguration={
-                        'LocationConstraint': 'eu-north-1'
-                    }
-                )
-                print(f"Successfully created bucket {self.bucket_name}")
-
-        except Exception as e:
-            print(f"Error creating bucket: {e}")
-
-
-    def save_to_s3(self, weather_data, city):
-        """Save weather data to S3 bucket"""
-        if not weather_data:
-            return False
-            
-        timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-        file_name = f"weather-data/{city}-{timestamp}.json"
-        
-        
-        try:
-            """put weather data into S3 bucket"""
-            weather_data['timestamp'] = timestamp
-            self.s3_client.put_object(
-                Bucket=self.bucket_name,
-                Key=file_name,
-                Body=json.dumps(weather_data),
-                ContentType='application/json'
-            )
-            print(f"Successfully saved data for {city} to S3")
-            return True
-        except Exception as e:
-            print(f"Error saving to S3: {e}")
-            return False
 ```
 This code create a class constructor named `WeatherDashboard` and stores different methods with each tasks to be executed. The `__init__` method takes an parameter `self`. `self` is a reference to the current instance of the class, and is used to access variables that belong to the class.
 
 The `__init__` methods creates various objects that stores the `api_key` for the OpenWeather API, `bucket_name` for the s3 bucket creation. 
 
+**Fetch Weather Data**
+
+```Python
+def fetch_weather(self, city):
+    """Fetch weather data from OpenWeather API"""
+    base_url = "http://api.openweathermap.org/data/2.5/forecast?"
+    params = {
+        "q": city,
+        "appid": self.api_key,
+        "units": "imperial"
+    }
+    
+    # Fetch weather data from API and handle errors if any occur
+    try:
+        response = requests.get(base_url, params=params)
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data: {e}")
+        return None
+    else:
+        response.raise_for_status()
+        return response.json()
+```
 The `fetch_weather` method takes two parameters `self` and `city` and creates a dictionary that stores the request parameter and creates a `try....except...else` block that fetches weather data from the OpenWeather API and handle errors if any occurs.
 
+**Create S3 Bucket**
+```Python
+def create_bucket_if_not_exists(self):
+    """Create S3 bucket if it doesn't exist"""
+    try:
+        self.s3_client.head_bucket(Bucket=self.bucket_name)
+        print(f"Bucket {self.bucket_name} exists")
+    except:
+        print(f"Creating bucket {self.bucket_name}")
+    try:
+        # Simpler creation for eu-north-1 region
+        if os.getenv('AWS_DEFAULT_REGION') == 'us-east-1':
+            self.s3_client.create_bucket(Bucket=self.bucket_name)
+            print(f"Successfully created bucket {self.bucket_name}")
+        else:
+            self.s3_client.create_bucket(
+                Bucket=self.bucket_name,
+                CreateBucketConfiguration={
+                    'LocationConstraint': 'eu-north-1'
+                }
+            )
+            print(f"Successfully created bucket {self.bucket_name}")
+
+    except Exception as e:
+        print(f"Error creating bucket: {e}")
+```
 The `create_bucket_if_not_exists` method takes the `self` parameter and creates a `try...except` block that creates the bucket if it doesn't already exist and returns the bucket object created with that bucket object name and handle errors if any occurs.
 
+**Save Data to S3**
+
+```Python
+def save_to_s3(self, weather_data, city):
+    """Save weather data to S3 bucket"""
+    if not weather_data:
+        return False
+        
+    timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+    file_name = f"weather-data/{city}-{timestamp}.json"
+    
+    try:
+        """put weather data into S3 bucket"""
+        weather_data['timestamp'] = timestamp
+        self.s3_client.put_object(
+            Bucket=self.bucket_name,
+            Key=file_name,
+            Body=json.dumps(weather_data),
+            ContentType='application/json'
+        )
+        print(f"Successfully saved data for {city} to S3")
+        return True
+    except Exception as e:
+        print(f"Error saving to S3: {e}")
+        return False
+```
 The `save_to_s3` method takes three parameters `self`, `weather_data`, and `city` and create a timestamp object that will be used as the timestamp for the bucket object created with the provided bucket object name and handle errors if any occurs. `try...except` blocks stores the bucket object created with the provided bucket object name and handle errors if any occurs.
+
+**Visualize Weather Data**
 
 ```Python
 # Visualize the weather data using a graphing library (e.g., matplotlib)
@@ -319,6 +359,8 @@ def visualize_weather_data(cities, temperatures, conditions):
     plt.show()
 ```
 The `visualize_weather_data` function creates a bar chart of the temperature for each city and annotates each bar with the weather condition.
+
+**Main Function**
 
 ```Python
 
@@ -387,8 +429,6 @@ def main():
 ```
 This code creates a function name `main` that stores the instance of a class in a variable name `dashboard`. The `main` function fetches the weather daa for predefined cities, saves it to an S3 bucket, print the status of the weather data and visualize the weather data using matplotlib.
 
-Click here to learn more about matplotlib: (Matplotlib)[https://www.youtube.com/watch?v=UO98lJQ3QGI&list=PL-osiE80TeTvipOqomVEeZ1HRrcEvtZB_]
-
 Run the following command to execute the application
 
 ```python 
@@ -400,3 +440,5 @@ You should see the following output:
 ## Step 7: Conclusion
 
 Congratulations! You’ve successfully built a weather data collection system using Python, AWS, and Boto3. This system fetches real-time weather data, stores it in an S3 bucket, and visualizes it using Matplotlib.
+
+Click here to learn more about matplotlib: (Matplotlib)[https://www.youtube.com/watch?v=UO98lJQ3QGI&list=PL-osiE80TeTvipOqomVEeZ1HRrcEvtZB_]
