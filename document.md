@@ -299,6 +299,29 @@ The `create_bucket_if_not_exists` method takes the `self` parameter and creates 
 The `save_to_s3` method takes three parameters `self`, `weather_data`, and `city` and create a timestamp object that will be used as the timestamp for the bucket object created with the provided bucket object name and handle errors if any occurs. `try...except` blocks stores the bucket object created with the provided bucket object name and handle errors if any occurs.
 
 ```Python
+# Visualize the weather data using a graphing library (e.g., matplotlib)
+def visualize_weather_data(cities, temperatures, conditions):
+    # Visualize the weather data using matplotlib.
+    axes = plt.subplots()[1]
+    # Create a bar chart
+    axes.bar(cities, temperatures, color= 'skyblue')
+        # Add labels and title
+    axes.set_xlabel('City')
+    axes.set_ylabel('Temperature (°F)')
+    axes.set_title(f"Weather in {cities} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Annotate each bar chart with the weather conditions
+    for i, condition in enumerate(conditions):
+        if i < len(temperatures):
+            axes.text(i, temperatures[i], condition, ha='center', va='bottom')
+
+    # Display the plot
+    plt.show()
+```
+The `visualize_weather_data` function creates a bar chart of the temperature for each city and annotates each bar with the weather condition.
+
+```Python
+
 def main():
     dashboard = WeatherDashboard()
     
@@ -321,9 +344,12 @@ def main():
                 print("Invalid input. Please enter 'yes' or 'no'.")
 
     #create an empty list for conditions
-    condtions = []
+    conditions = []
     # create an empty list for temperatures
     temperatures = []
+
+
+
     for city in cities:
 
         print(f"\nFetching weather for {city}...")
@@ -331,52 +357,35 @@ def main():
         # create a variable to hold the weather data for the city and print the temperature, feels like, humidity and description
         weather_data = dashboard.fetch_weather(city)
         if weather_data:
-            temp = weather_data['main']['temp'] 
-            feels_like = weather_data['main']['feels_like']
-            humidity = weather_data['main']['humidity']
-            description = weather_data['weather'][0]['description']
+            temp = weather_data['list'][0]['main']['temp']
+            feels_like = weather_data['list'][0]['main']['feels_like']
+            humidity = weather_data['list'][0]['main']['humidity']
+            condition = weather_data['list'][0]['weather'][0]['description']
             
             print(f"Temperature: {temp}°F")
             print(f"Feels like: {feels_like}°F")
             print(f"Humidity: {humidity}%")
-            print(f"Conditions: {description}")
+            print(f"Conditions: {conditions}")
+
             # Add temperatures and conditions to respective lists
             temperatures.append(temp)
-            condtions.append(description)
-            
-        # visualize weather data
-        visualize_weather_data(city, temp)
-        
+            conditions.append(condition)
+
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
         if success:
             print(f"Weather data for {city} saved to S3!")
         else:
             print(f"Failed to fetch weather data for {city}")
-    
-    # Visualize the weather data using a graphing library (matplotlib)
-    def visualize_weather_data(city, temp, description):
-        # Visualize the weather data using matplotlib.
-        axes = plt.subplots()[1]
-        # Create a bar chart
-        axes.bar(city, temp, color= 'skyblue')
-        axes.set_xlabel('City')
-        axes.set_ylabel('Temperature (°F)')
-        axes.set_title(f"Weather in {city} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-        # Annotate each bar chart with the weather conditions
-        for i, condition in enumerate(description):
-            axes.text(i, temp[i], condition, ha='center', va='bottom')
+    # visualize weather data
+    # print(city)
+    visualize_weather_data(cities, temperatures, conditions)
 
-        # Display the plot
-        plt.show()
-    
     return "Weather data collected successfully"
 
 ```
 This code creates a function name `main` that stores the instance of a class in a variable name `dashboard`. The `main` function fetches the weather daa for predefined cities, saves it to an S3 bucket, print the status of the weather data and visualize the weather data using matplotlib.
-
-The `visualize_weather_data` function creates a bar chart of the temperature for each city and annotates each bar with the weather condition.
 
 Click here to learn more about matplotlib: (Matplotlib)[https://www.youtube.com/watch?v=UO98lJQ3QGI&list=PL-osiE80TeTvipOqomVEeZ1HRrcEvtZB_]
 

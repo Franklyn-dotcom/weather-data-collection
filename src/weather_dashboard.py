@@ -127,7 +127,7 @@ def main():
                 print("Invalid input. Please enter 'yes' or 'no'.")
 
     #create an empty list for conditions
-    condtions = []
+    conditions = []
     # create an empty list for temperatures
     temperatures = []
 
@@ -143,7 +143,7 @@ def main():
             temp = weather_data['list'][0]['main']['temp']
             feels_like = weather_data['list'][0]['main']['feels_like']
             humidity = weather_data['list'][0]['main']['humidity']
-            conditions = weather_data['list'][0]['weather'][0]['description']
+            condition = weather_data['list'][0]['weather'][0]['description']
             
             print(f"Temperature: {temp}°F")
             print(f"Feels like: {feels_like}°F")
@@ -152,8 +152,8 @@ def main():
 
             # Add temperatures and conditions to respective lists
             temperatures.append(temp)
-            condtions.append(conditions)
-        
+            conditions.append(condition)
+
         # Save to S3
         success = dashboard.save_to_s3(weather_data, city)
         if success:
@@ -162,6 +162,7 @@ def main():
             print(f"Failed to fetch weather data for {city}")
 
     # visualize weather data
+    # print(city)
     visualize_weather_data(cities, temperatures, conditions)
 
     return "Weather data collected successfully"
